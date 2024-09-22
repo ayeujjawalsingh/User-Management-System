@@ -90,7 +90,7 @@ Each microservice communicates with others using gRPC for internal service commu
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/ayeujjawalsingh/microservice-auth-system.git
+    git clone https://github.com/ayeujjawalsingh/User-Management-System.git
     ```
 
 2. Build and run the services:
