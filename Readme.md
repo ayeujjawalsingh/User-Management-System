@@ -1,6 +1,6 @@
 # User Management System
 
-This project demonstrates a microservice architecture designed to manage user registration, authentication, password management, and communication through email/SMS notifications. The system uses an API Gateway for routing client requests to the respective services.
+This project demonstrates a microservice architecture designed to manage user registration, authentication, password management, and communication through a notification service that includes email and SMS features for sending OTPs and other information to users. The system uses an API Gateway for routing client requests to the respective services.
 
 ## Architecture Overview
 
@@ -64,8 +64,7 @@ Each microservice communicates with others using gRPC for internal service commu
 1. The **Client** sends requests to the **API Gateway**.
 2. Based on the request type (e.g., registration, login, profile update, password reset), the **API Gateway** forwards the request to the appropriate microservice.
 3. For operations requiring authentication, the **API Gateway** validates the token via the **Authentication Service**.
-4. Each microservice checks if the user exists in the system before performing actions such as login, OTP validation, or profile update.
-5. Services communicate with each other using gRPC for secure and fast interaction.
+4. Services communicate with each other using gRPC for secure and fast interaction.
 
 ---
 
@@ -95,7 +94,7 @@ Each microservice communicates with others using gRPC for internal service commu
 
 2. Build and run the services:
     ```bash
-    cd microservice-auth-system
+    cd user-management-system
     mvn clean install
     docker-compose up -d
     ```
