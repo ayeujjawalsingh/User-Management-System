@@ -14,7 +14,7 @@ import com.ujjawal.user_management_system.userservice.model.UserProfileModel;
 public interface UserProfileRepository extends JpaRepository<UserProfileModel, UUID> {
 
     // Fetch user details by userId where status is active
-    @Query("SELECT ud FROM UserProfileModel ud WHERE ud.user = :userId AND ud.status = '1'")
+    @Query("SELECT ud FROM UserProfileModel ud WHERE ud.user.id = :userId AND ud.status = '1'")
     Optional<UserProfileModel> findActiveByUserId(@Param("userId") UUID userId);
 
     // Check if active user details exist by userId

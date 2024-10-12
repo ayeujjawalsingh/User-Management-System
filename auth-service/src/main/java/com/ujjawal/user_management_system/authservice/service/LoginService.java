@@ -15,6 +15,10 @@ import org.slf4j.LoggerFactory;
 import io.grpc.StatusRuntimeException;
 import java.util.Optional;
 import com.ujjawal.user_management_system.authservice.grpc.UserServiceClient; // Add this import
+import com.ujjawal.user_management_system.authservice.model.RefreshTokenModel;
+import com.ujjawal.user_management_system.authservice.repository.RefreshTokenRepository;
+import java.util.UUID;
+import java.time.ZoneOffset;
 
 @Service
 public class LoginService {
@@ -25,12 +29,14 @@ public class LoginService {
     private final JwtService jwtService;
     @Autowired
     private UserServiceClient userServiceClient;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    public LoginService(JwtService jwtService, UserServiceClient userServiceClient) {
+    public LoginService(JwtService jwtService, UserServiceClient userServiceClient, RefreshTokenRepository refreshTokenRepository) {
         this.argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
         this.jwtService = jwtService;
         this.userServiceClient = userServiceClient;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     public boolean verifyPassword(String input, String hashed) {
@@ -49,6 +55,15 @@ public class LoginService {
             System.out.println("Hashed Password: " + response.getHashedPassword());
             if (verifyPassword(credential, response.getHashedPassword())) {
                 String token = jwtService.generateToken(identifier);
+                
+                // Generate and save refresh token
+                String refreshToken = UUID.randomUUID().toString();
+                RefreshTokenModel refreshTokenModel = new RefreshTokenModel();
+                refreshTokenModel.setToken(refreshToken);
+                refreshTokenModel.setUserId(UUID.fromString("7b375e78-abe7-49c1-8c29-4beef27c4bbe"));
+                refreshTokenModel.setExpiryDate(LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.UTC));
+                refreshTokenRepository.save(refreshTokenModel);
+
                 logger.info("Login successful for user: {}", identifier);
                 return new LoginResponse(200, "Login successful", token);
             } else {

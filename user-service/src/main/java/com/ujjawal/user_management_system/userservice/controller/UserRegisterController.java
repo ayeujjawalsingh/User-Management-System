@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/user")
 public class UserRegisterController {
 
     private final UserRegisterService userService;
@@ -20,28 +21,20 @@ public class UserRegisterController {
         this.userService = userService;
     }
 
-    @PostMapping("register")
+    @PostMapping("/register")
     public ResponseEntity<UserRegisterResponse> createUser(@RequestBody UserRegisterRequest request) {
-        try {
-            UserModel user = createUserModel(request);
-            UserProfileModel userProfile = createUserProfileModel(request);
-
-            // Call the service and get the response
-            UserRegisterResponse response = userService.createUser(user, userProfile);
-            System.out.println("response: "+response);
-            System.out.println("response.statusCode(): "+response.statusCode());
-            // Return the appropriate HTTP status based on the response
-            if (response.statusCode() == 201) {
-                return ResponseEntity.status(HttpStatus.CREATED).body(response);
-            } else if (response.statusCode() == 400) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-            }
-
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        UserModel user = createUserModel(request);
+        UserProfileModel userProfile = createUserProfileModel(request);
+    
+        // Call the service and get the response
+        UserRegisterResponse response = userService.createUser(user, userProfile);
+    
+        // Return the appropriate HTTP status based on the response
+        return switch (response.statusCode()) {
+            case 201 -> ResponseEntity.status(HttpStatus.CREATED).body(response);
+            case 400 -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            default -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        };
     }
 
     // Private methods to avoid code duplication
