@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ujjawal.user_management_system.authservice.grpc";
+option java_outer_classname = "UserServiceProto";
+
+service UserService {
+  rpc GetUserByIdentifier (UserRequest) returns (UserResponse);
+}
+
+message UserRequest {
+  string identifier = 1;
+}
+
+message UserResponse {
+  string hashedPassword = 1;
+  bool userExists = 2;
+}
