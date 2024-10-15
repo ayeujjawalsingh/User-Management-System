@@ -14,5 +14,6 @@ message UserRequest {
 
 message UserResponse {
   string hashedPassword = 1;
-  bool userExists = 2;
+  string userId = 2;
+  bool userExists = 3;
 }

@@ -9,6 +9,8 @@ import io.grpc.stub.StreamObserver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
+import java.util.UUID;
+
 import net.devh.boot.grpc.server.service.GrpcService;
 
 @GrpcService
@@ -38,7 +40,9 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
 
         if (userOptional.isPresent()) {
             UserModel user = userOptional.get();
+            UUID userId = user.getId();
             responseBuilder.setUserExists(true)
+                    .setUserId(userId.toString())
                     .setHashedPassword(user.getPassword());
         } else {
             responseBuilder.setUserExists(false);

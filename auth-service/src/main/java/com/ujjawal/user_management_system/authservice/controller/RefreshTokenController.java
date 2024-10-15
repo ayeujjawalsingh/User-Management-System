@@ -19,6 +19,7 @@ public class RefreshTokenController {
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request) {
         try {
+            System.out.println("refresh token: "+request.getRefreshToken());
             String requestRefreshToken = request.getRefreshToken();
             TokenRefreshResponse response = refreshTokenService.createAccessTokenByRefreshToken(requestRefreshToken);
             return ResponseEntity.ok(response);

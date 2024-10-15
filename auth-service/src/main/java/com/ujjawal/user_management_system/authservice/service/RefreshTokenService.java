@@ -20,14 +20,15 @@ public class RefreshTokenService {
    private RefreshTokenRepository refreshTokenRepository;
 
    public TokenRefreshResponse createAccessTokenByRefreshToken(String refreshToken) {
-        // Check if refresh token exists in database
+       System.out.println(refreshToken);
+       // Check if refresh token exists in database
         RefreshTokenModel storedToken = refreshTokenRepository.findByToken(refreshToken)
            .orElseThrow(() -> new TokenRefreshException(refreshToken, "Refresh token invalid"));
-       
+       System.out.println(storedToken);
 
        // Validate the token format and expiration
        Map<String, Object> refreshTokenStatus = jwtService.validateToken(refreshToken);
-       
+       System.out.println(refreshTokenStatus);
        // Check if the token is valid
        if (!(Boolean) refreshTokenStatus.get("isValid")) {
            throw new TokenRefreshException(refreshToken, "Invalid refresh token");
@@ -41,7 +42,7 @@ public class RefreshTokenService {
        }
        
        // Generate new access token
-       String newAccessToken = jwtService.generateToken(userId);
+       String newAccessToken = jwtService.generateToken(userId, "accessToken");
        return new TokenRefreshResponse(newAccessToken, refreshToken);
    }
 }

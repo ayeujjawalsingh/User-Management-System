@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.grpc.StatusRuntimeException;
 import java.util.Optional;
-import com.ujjawal.user_management_system.authservice.grpc.UserServiceClient; // Add this import
+import com.ujjawal.user_management_system.authservice.grpc.UserServiceClient;
 import com.ujjawal.user_management_system.authservice.model.RefreshTokenModel;
 import com.ujjawal.user_management_system.authservice.repository.RefreshTokenRepository;
 import java.util.UUID;
@@ -50,32 +50,32 @@ public class LoginService {
             UserResponse response = userServiceClient.getUserByIdentifier(identifier);
             System.out.println("response: " + response);
             if (! response.getUserExists()) {
-                return new LoginResponse(404, "User not found", null);
+                return new LoginResponse(404, "User not found", null, null);
             }
             System.out.println("Hashed Password: " + response.getHashedPassword());
             if (verifyPassword(credential, response.getHashedPassword())) {
-                String token = jwtService.generateToken(identifier);
-                
+                String accessToken = jwtService.generateToken(response.getUserId(), "accessToken");
+
                 // Generate and save refresh token
-                String refreshToken = UUID.randomUUID().toString();
+                String refreshToken = jwtService.generateToken(response.getUserId(), "refreshToken");
                 RefreshTokenModel refreshTokenModel = new RefreshTokenModel();
-                refreshTokenModel.setToken(jwtService.generateToken(UUID.randomUUID().toString()));
-                refreshTokenModel.setUserId(UUID.fromString("7b375e78-abe7-49c1-8c29-4beef27c4bbe"));
-                refreshTokenModel.setExpiryDate(LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.UTC));
+                refreshTokenModel.setToken(refreshToken);
+                refreshTokenModel.setUserId(UUID.fromString(response.getUserId()));
+                refreshTokenModel.setExpiryDate(LocalDateTime.now().plusDays(15).toInstant(ZoneOffset.UTC));
                 refreshTokenRepository.save(refreshTokenModel);
 
                 logger.info("Login successful for user: {}", identifier);
-                return new LoginResponse(200, "Login successful", token);
+                return new LoginResponse(200, "Login successful", accessToken, refreshToken);
             } else {
                 logger.warn("Invalid password for user: {}", identifier);
-                return new LoginResponse(401, "Invalid password", null);
+                return new LoginResponse(401, "Invalid password", null, null);
             }
         } catch (StatusRuntimeException e) {
             logger.error("gRPC communication error during authentication", e);
-            return new LoginResponse(500, "Authentication service unavailable: " + e.getMessage(), null);
+            return new LoginResponse(500, "Authentication service unavailable: " + e.getMessage(), null, null);
         } catch (Exception e) {
             logger.error("Unexpected error during authentication", e);
-            return new LoginResponse(500, "An unexpected error occurred: " + e.getMessage(), null);
+            return new LoginResponse(500, "An unexpected error occurred: " + e.getMessage(), null, null);
         }
     }
 

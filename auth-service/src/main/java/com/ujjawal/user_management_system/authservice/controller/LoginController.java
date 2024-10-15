@@ -37,10 +37,10 @@ public class LoginController {
                     .body(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new LoginResponse(HttpStatus.BAD_REQUEST.value(), "Invalid request: " + e.getMessage(), ""));
+                    .body(new LoginResponse(HttpStatus.BAD_REQUEST.value(), "Invalid request: " + e.getMessage(), null, null));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new LoginResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred: " + e.getMessage(), ""));
+                    .body(new LoginResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred: " + e.getMessage(), null, null));
         }
     }
 }

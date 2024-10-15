@@ -3,13 +3,15 @@ package com.ujjawal.user_management_system.authservice.dto;
 public class LoginResponse {
     private int statusCode;
     private String message;
-    private String token;
+    private String accessToken;
+    private String refreshToken;
 
     // Constructor, getters, and setters
-    public LoginResponse(int statusCode, String message,  String token) {
+    public LoginResponse(int statusCode, String message,  String accessToken, String refreshToken) {
         this.statusCode = statusCode;
         this.message = message;
-        this.token = token;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 
     public int getStatusCode() {
@@ -28,11 +30,19 @@ public class LoginResponse {
         this.message = message;
     }
 
-    public String getToken() {
-        return token;
+    public String getaccessToken() {
+        return accessToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setaccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
