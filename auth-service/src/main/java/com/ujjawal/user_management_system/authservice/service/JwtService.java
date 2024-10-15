@@ -36,13 +36,13 @@ public class JwtService {
         }
     }
 
-    public String generateToken(String identifier) {
+    public String generateToken(String userId) {
 
         Map<String, Object> claims = new HashMap<>();
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(identifier)
+                .setSubject(userId)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000*60*30))
                 .signWith(getKey(), SignatureAlgorithm.HS256).compact();
@@ -54,8 +54,8 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractIdentifier(String token) {
-        // extract the username from jwt token
+    public String extractUserId(String token) {
+        // extract the user id from jwt token
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -71,22 +71,24 @@ public class JwtService {
     }
 
 
-//    public boolean validateToken(String token, UserDetails userDetails) {
-//        final String identifier = extractIdentifier(token);
-//        if (identifier.matches("^\\d{10,15}$")) {
-//            // It's a mobile number
-//            return (identifier.equals(((UserPrinciple) userDetails).getMobile()) && isTokenExpired(token));
-//        } else if (identifier.contains("@")) {
-//            // It's an email
-//            return (identifier.equals(((UserPrinciple) userDetails).getEmail()) && isTokenExpired(token));
-//        } else {
-//            // It's a username
-//            return (identifier.equals(userDetails.getUsername()) && isTokenExpired(token));
-//        }
-//    }
+    public Map<String, Object> validateToken(String token) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String userId = extractUserId(token);
+            boolean isExpired = isTokenExpired(token);
+            result.put("userId", userId);
+            result.put("isExpired", isExpired);
+            result.put("isValid", userId != null && !isExpired);
+        } catch (Exception e) {
+            result.put("userId", null);
+            result.put("isExpired", true);
+            result.put("isValid", false);
+        }
+        return result;
+    }
 
     private boolean isTokenExpired(String token) {
-        return !extractExpiration(token).before(new Date());
+        return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {

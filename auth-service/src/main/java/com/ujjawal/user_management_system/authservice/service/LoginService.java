@@ -59,7 +59,7 @@ public class LoginService {
                 // Generate and save refresh token
                 String refreshToken = UUID.randomUUID().toString();
                 RefreshTokenModel refreshTokenModel = new RefreshTokenModel();
-                refreshTokenModel.setToken(refreshToken);
+                refreshTokenModel.setToken(jwtService.generateToken(UUID.randomUUID().toString()));
                 refreshTokenModel.setUserId(UUID.fromString("7b375e78-abe7-49c1-8c29-4beef27c4bbe"));
                 refreshTokenModel.setExpiryDate(LocalDateTime.now().plusDays(7).toInstant(ZoneOffset.UTC));
                 refreshTokenRepository.save(refreshTokenModel);
