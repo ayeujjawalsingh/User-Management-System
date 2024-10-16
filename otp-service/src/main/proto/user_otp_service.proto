@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ujjawal.user_management_system.otpservice.grpc";
+option java_outer_classname = "UserOTPServiceProto";
+
+service UserOTPService {
+  rpc verifyOTPByUserID (UserOTPRequest) returns (UserOTPResponse);
+}
+
+message UserOTPRequest {
+  string userId = 1;
+  string otp = 2;
+}
+
+message UserOTPResponse {
+  bool otpVerified = 1;
+}

@@ -1,8 +1,8 @@
 package com.ujjawal.user_management_system.userservice.grpc;
 
-import com.ujjawal.user_management_system.userservice.grpc.UserRequest;
-import com.ujjawal.user_management_system.userservice.grpc.UserResponse;
-import com.ujjawal.user_management_system.userservice.grpc.UserServiceGrpc;
+import com.ujjawal.user_management_system.userservice.grpc.UserPasswordRequest;
+import com.ujjawal.user_management_system.userservice.grpc.UserPasswordResponse;
+import com.ujjawal.user_management_system.userservice.grpc.UserPasswordServiceGrpc;
 import com.ujjawal.user_management_system.userservice.repository.UserRepository;
 import com.ujjawal.user_management_system.userservice.model.UserModel;
 import io.grpc.stub.StreamObserver;
@@ -14,16 +14,16 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 import java.util.UUID;
 
-
 @GrpcService
-public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
+public class UserPasswordServiceImpl extends UserPasswordServiceGrpc.UserPasswordServiceImplBase {
 
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public void getUserByIdentifier(UserRequest request, StreamObserver<UserResponse> responseObserver) {
+    public void setPasswordByIdentifier(UserPasswordRequest request, StreamObserver<UserPasswordResponse> responseObserver) {
         String identifier = request.getIdentifier();
+        String hashedPassword = request.getHashedPassword();
         Optional<UserModel> userOptional;
 
         if (identifier.matches("^\\d{10,15}$")) {
@@ -34,15 +34,18 @@ public class UserServiceImpl extends UserServiceGrpc.UserServiceImplBase {
             userOptional = userRepository.findByUsernameAndStatus(identifier, "1");
         }
 
-        UserResponse.Builder responseBuilder = UserResponse.newBuilder();
+        UserPasswordResponse.Builder responseBuilder = UserPasswordResponse.newBuilder();
 
         if (userOptional.isPresent()) {
             UserModel user = userOptional.get();
+            user.setPassword(hashedPassword);
+            userRepository.save(user);
+
             responseBuilder.setUserExists(true)
-                    .setUserId(user.getId().toString())
-                    .setHashedPassword(user.getPassword());
+                    .setPasswordSaved(true);
         } else {
-            responseBuilder.setUserExists(false);
+            responseBuilder.setUserExists(false)
+                    .setPasswordSaved(false);
         }
 
         responseObserver.onNext(responseBuilder.build());
