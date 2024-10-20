@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ujjawal.user_management_system.notificationservice.grpc";
+option java_outer_classname = "NotificationProto";
+
+service NotificationService {
+  rpc SendNotificationByIdentifier (NotificationRequest) returns (NotificationResponse);
+}
+
+message NotificationRequest {
+  string mobile = 1;
+  string email = 2;
+  string slug = 3;
+  map<string, string> additional_data = 4;
+}
+
+message NotificationResponse {
+  bool notificationStatus = 1;
+}

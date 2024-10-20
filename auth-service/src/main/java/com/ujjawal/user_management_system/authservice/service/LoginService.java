@@ -5,15 +5,14 @@ import com.ujjawal.user_management_system.authservice.grpc.UserResponse;
 //import com.ujjawal.user_management_system.authservice.auth.AuthService;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
-import org.springframework.util.StringUtils;
+
 import java.time.LocalDateTime;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import io.grpc.StatusRuntimeException;
-import java.util.Optional;
 import com.ujjawal.user_management_system.authservice.grpc.UserServiceClient;
 import com.ujjawal.user_management_system.authservice.model.RefreshTokenModel;
 import com.ujjawal.user_management_system.authservice.repository.RefreshTokenRepository;
@@ -46,6 +45,10 @@ public class LoginService {
 
     public LoginResponse authenticateUser(String identifier, String credential, boolean isOtp) {
         try {
+            if (identifier == null || identifier.isEmpty()) {
+                return new LoginResponse(404,"Identifier is missing or empty", null, null);
+            }
+
             System.out.println("identifier: " + identifier);
             UserResponse response = userServiceClient.getUserByIdentifier(identifier);
             System.out.println("response: " + response);

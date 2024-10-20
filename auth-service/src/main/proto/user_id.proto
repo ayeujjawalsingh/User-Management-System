@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ujjawal.user_management_system.authservice.grpc";
+option java_outer_classname = "UserIdServiceProto";
+
+service UserIdService {
+  rpc ValidateUserByUserId (UserIdRequest) returns (UserIdResponse);
+}
+
+message UserIdRequest {
+  string userId = 1;
+}
+
+message UserIdResponse {
+  bool userExists = 1;
+}

@@ -19,6 +19,9 @@ public interface UserRepository extends JpaRepository<UserModel, UUID> {
     // Find active user by email
     Optional<UserModel> findByEmailAndStatus(String email, String status);
 
+    // Find active user by userId
+    Optional<UserModel> findByIdAndStatus(UUID Id, String status);
+
     // Check if an active user exists by username
     boolean existsByUsernameAndStatus(String username, String status);
 

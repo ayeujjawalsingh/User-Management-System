@@ -2,7 +2,9 @@ package com.ujjawal.user_management_system.otpservice.service;
 
 import com.ujjawal.user_management_system.otpservice.dto.GenerateOTPRequest;
 import com.ujjawal.user_management_system.otpservice.dto.GenerateOTPResponse;
+import com.ujjawal.user_management_system.otpservice.grpc.NotificationServiceClient;
 import com.ujjawal.user_management_system.otpservice.grpc.UserResponse;
+import com.ujjawal.user_management_system.otpservice.grpc.NotificationResponse;
 import com.ujjawal.user_management_system.otpservice.model.UserOTPModel;
 import com.ujjawal.user_management_system.otpservice.repository.UserOTPRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 public class GenerateOTPService {
@@ -26,11 +30,15 @@ public class GenerateOTPService {
 
     private final UserOTPRepository userOTPRepository;
     private final UserServiceClient userServiceClient;
+    private final NotificationServiceClient notificationServiceClient;
 
     @Autowired
-    public GenerateOTPService(UserOTPRepository userOTPRepository, UserServiceClient userServiceClient) {
+    public GenerateOTPService(UserOTPRepository userOTPRepository,
+                              UserServiceClient userServiceClient,
+                              NotificationServiceClient notificationServiceClient) {
         this.userOTPRepository = userOTPRepository;
         this.userServiceClient = userServiceClient;
+        this.notificationServiceClient = notificationServiceClient;
     }
 
     public GenerateOTPResponse generateOTP(GenerateOTPRequest request) {
@@ -69,6 +77,27 @@ public class GenerateOTPService {
             userOTPModel.setExpirationTime(Instant.now().plus(5, ChronoUnit.MINUTES));
             userOTPModel.setStatus(UserOTPModel.OTPStatus.ACTIVE);
             userOTPRepository.save(userOTPModel);
+
+            // Prepare notification data
+            String mobile = "null";
+            String email = "null";
+            if (identifier.contains("@")) {
+                email = identifier;
+            } else {
+                mobile = identifier;
+            }
+            String slug = "SEND_OTP";
+            Map<String, String> additionalData = new HashMap<>();
+            additionalData.put("OTP", otp);
+
+            // Send notification
+            NotificationResponse notificationResponse = notificationServiceClient.sendNotificationByIdentifier(
+                mobile, email, slug, additionalData
+            );
+            System.out.println("notificationResponse: " + notificationResponse);
+            if (!notificationResponse.getNotificationStatus()) {
+                logger.warn("Failed to send OTP notification: {}", notificationResponse.getNotificationStatus());
+            }
 
             return new GenerateOTPResponse(200, "OTP generated successfully", otp);
         } catch (IllegalArgumentException e) {
