@@ -4,3 +4,5 @@
 /notification-service/src/main/resources/application.properties
 /otp-service/src/main/resources/application.properties
 /password-service/src/main/resources/application.properties
+/.vscode
+/.idea
